@@ -5,14 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import patches
 
+## show ufmf of flies with keypoint (APT) and ellipse (FlyTracker) tracking
+
 # APT keypoint tracking
-trkfilepath = 'demo_trajectory_data/apt.trk'
+trkfilepath = 'demo_trajectory_data/flies/apt.trk'
 
 # Ctrax/FlyTracker ellipse trajectories
-trxfilepath = 'demo_trajectory_data/registered_trx.mat'
+trxfilepath = 'demo_trajectory_data/flies/registered_trx.mat'
 
 # ufmf video
-moviepath = 'demo_trajectory_data/movie.ufmf'
+moviepath = 'demo_trajectory_data/flies/movie.ufmf'
 
 # frame to plot
 t = 1234
@@ -52,9 +54,43 @@ for fly in range(nflies):
     ax.add_patch(ell)
 
 fig.tight_layout()
-plt.show()
 mov.close()
 mov = None
 
 
+## show mjpg of mice with keypoint (APT) tracking
 
+# APT keypoint tracking
+trkfilepath = 'demo_trajectory_data/mice/apt.trk'
+
+# mjpg video
+moviepath = 'demo_trajectory_data/mice/movie.mjpg'
+movieindexpath = 'demo_trajectory_data/mice/movie.txt'
+
+# frame to plot
+t = 1234
+
+# open video
+mov = movies.Movie(moviepath)
+
+# load APT trajectories
+apttrk = TrkFile.Trk(trkfilepath)
+
+# read video frame
+im,timestamp = mov.get_frame(t)
+
+# read frame from APT trajectories
+# nkeypoints x 2 x nframes x nmice
+kp = apttrk.getframe(t)
+
+nmice = kp.shape[-1]
+
+# plot
+fig,ax = plt.subplots(1)
+ax.imshow(im,vmin=0,vmax=255,cmap='gray')
+h = ax.plot(kp[:,0,0,:],kp[:,1,0,:],'.')
+
+fig.tight_layout()
+plt.show()
+mov.close()
+mov = None
